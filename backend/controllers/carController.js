@@ -1,9 +1,7 @@
-import {cars} from "../models/cars.js";
+import { cars } from "../models/cars.js";
 
 // GET all cars
-export const getCars = (req, res) => {
-  res.json(cars);
-};
+export const getCars = (req, res) => res.json(cars);
 
 // ADD car
 export const addCar = (req, res) => {
@@ -15,11 +13,8 @@ export const addCar = (req, res) => {
 // EDIT car
 export const editCar = (req, res) => {
   const { id } = req.params;
-  const index = cars.findIndex((c) => c.id == id);
-
-  if (index === -1) {
-    return res.status(404).json({ message: "Car not found" });
-  }
+  const index = cars.findIndex(c => c.id == id);
+  if (index === -1) return res.status(404).json({ message: "Car not found" });
 
   cars[index] = { ...cars[index], ...req.body };
   res.json(cars[index]);
@@ -28,14 +23,10 @@ export const editCar = (req, res) => {
 // DELETE car
 export const deleteCar = (req, res) => {
   const { id } = req.params;
-  const index = cars.findIndex((c) => c.id == id);
-
-  if (index === -1) {
-    return res.status(404).json({ message: "Car not found" });
-  }
+  const index = cars.findIndex(c => c.id == id);
+  if (index === -1) return res.status(404).json({ message: "Car not found" });
 
   const deletedCar = cars[index];
   cars.splice(index, 1);
-
   res.json(deletedCar);
 };

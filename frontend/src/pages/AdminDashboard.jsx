@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
-import axios from "axios";
+import { fetchCars, addCar, editCar, deleteCar } from "../api";
 
 export default function AdminDashboard() {
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // modal states
+  // Modal states
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -22,24 +22,25 @@ export default function AdminDashboard() {
     status: "Available"
   });
 
-  // load cars
-  const fetchCars = async () => {
+  // Load cars
+  const loadCars = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/cars");
-      setCars(res.data);
+      const data = await fetchCars();
+      setCars(data);
     } catch (err) {
       console.error("Failed to fetch cars:", err);
+      alert("Failed to load cars.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCars();
+    loadCars();
   }, []);
 
-  // form helpers
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  // Form helpers
+  const handleChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const openAddModal = () => {
     setFormData({ title: "", brand: "", year: "", mileage: "", price: "", imageUrl: "", status: "Available" });
@@ -47,7 +48,7 @@ export default function AdminDashboard() {
     setShowAddModal(true);
   };
 
-  const openEditModal = (car) => {
+  const openEditModal = car => {
     setSelectedCar(car);
     setFormData({
       title: car.title || "",
@@ -61,47 +62,47 @@ export default function AdminDashboard() {
     setShowEditModal(true);
   };
 
-  const openDeleteModal = (car) => {
+  const openDeleteModal = car => {
     setSelectedCar(car);
     setShowDeleteModal(true);
   };
 
-  // add
-  const handleAddCar = async (e) => {
+  // Add car
+  const handleAddCar = async e => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/cars", { ...formData, price: Number(formData.price) });
+      await addCar({ ...formData, price: Number(formData.price), year: Number(formData.year) });
       setShowAddModal(false);
-      fetchCars();
+      loadCars();
     } catch (err) {
       console.error("Add failed:", err);
       alert("Add failed.");
     }
   };
 
-  // edit
-  const handleEditCar = async (e) => {
+  // Edit car
+  const handleEditCar = async e => {
     e.preventDefault();
     if (!selectedCar) return;
     try {
-      await axios.put(`http://localhost:5000/api/cars/${selectedCar.id}`, { ...formData, price: Number(formData.price) });
+      await editCar(selectedCar.id, { ...formData, price: Number(formData.price), year: Number(formData.year) });
       setShowEditModal(false);
       setSelectedCar(null);
-      fetchCars();
+      loadCars();
     } catch (err) {
       console.error("Edit failed:", err);
       alert("Edit failed.");
     }
   };
 
-  // delete
+  // Delete car
   const handleDeleteCar = async () => {
     if (!selectedCar) return;
     try {
-      await axios.delete(`http://localhost:5000/api/cars/${selectedCar.id}`);
+      await deleteCar(selectedCar.id);
       setShowDeleteModal(false);
       setSelectedCar(null);
-      fetchCars();
+      loadCars();
     } catch (err) {
       console.error("Delete failed:", err);
       alert("Delete failed.");
@@ -124,7 +125,7 @@ export default function AdminDashboard() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {cars.map((car) => (
+            {cars.map(car => (
               <div key={car.id} className="bg-gray-800 p-4 rounded-2xl">
                 <img src={car.imageUrl} alt={car.title} className="w-full h-56 object-cover rounded-xl mb-3" />
                 <h2 className="text-xl font-bold">{car.title}</h2>
@@ -186,17 +187,17 @@ export default function AdminDashboard() {
   );
 }
 
+// Modal wrapper
 const Modal = ({ children }) => (
-  <div className="fixed inset-0 bg-black/60 flex justify-center items-center p-4 z-50">
-    {children}
-  </div>
+  <div className="fixed inset-0 bg-black/60 flex justify-center items-center p-4 z-50">{children}</div>
 );
 
+// Car Form
 const CarForm = ({ title, formData, handleChange, onSubmit, onClose }) => (
   <div className="bg-gray-800 p-6 rounded-2xl w-full max-w-md">
     <h2 className="text-2xl font-bold text-yellow-400 mb-4 text-center">{title}</h2>
     <form onSubmit={onSubmit} className="space-y-4">
-      {["title","brand","year","mileage","price","imageUrl","status"].map((key) => (
+      {["title","brand","year","mileage","price","imageUrl","status"].map(key => (
         <div key={key}>
           {key === "status" ? (
             <select name="status" value={formData.status} onChange={handleChange} className="w-full p-3 rounded-xl bg-gray-700 text-white">
@@ -216,7 +217,6 @@ const CarForm = ({ title, formData, handleChange, onSubmit, onClose }) => (
           )}
         </div>
       ))}
-
       <div className="flex gap-3">
         <button type="submit" className="flex-1 bg-green-500 py-3 rounded-full font-semibold hover:bg-green-400 transition">Save</button>
         <button type="button" onClick={onClose} className="flex-1 bg-gray-600 py-3 rounded-full font-semibold hover:bg-gray-500 transition">Cancel</button>
