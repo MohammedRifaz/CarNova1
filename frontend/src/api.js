@@ -1,6 +1,5 @@
-// src/api.js
+// Replace with your live Render backend URL
 export const API_URL = "https://carnova1.onrender.com/api";
-
 
 export const fetchCars = async () => {
   const res = await fetch(`${API_URL}/cars`);
@@ -31,10 +30,21 @@ export const deleteCar = async (id) => {
 };
 
 export const adminLogin = async (username, password) => {
-  const res = await fetch(`${API_URL}/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
-  return res.json();
+  try {
+    const res = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Login failed");
+    }
+
+    return res.json();
+  } catch (err) {
+    console.error("Login error:", err.message);
+    return { success: false, message: err.message };
+  }
 };

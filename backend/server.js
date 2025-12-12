@@ -1,14 +1,26 @@
 import express from "express";
 import cors from "cors";
 import carRoutes from "./routes/carRoutes.js";
-import authRoutes from "./routes/authRoutes.js"; // make sure path is correct
+import authRoutes from "./routes/authRoutes.js";
 
 const app = express();
 
-app.use(cors());          // allow frontend requests
-app.use(express.json());   // parse JSON
+// ⚡ Enable CORS for Netlify frontend
+app.use(cors({
+  origin: "*" // optional: replace "*" with your Netlify URL for security
+}));
 
+app.use(express.json());
+
+// Mount API routes
 app.use("/api/cars", carRoutes);
-app.use("/api/auth", authRoutes);  // ⚠ this mounts /login
+app.use("/api/auth", authRoutes);
 
-app.listen(5000, () => console.log("Server running on port 5000"));
+// Optional: default route
+app.get("/", (req, res) => {
+  res.send("CarNova Backend is running!");
+});
+
+app.listen(process.env.PORT || 5000, () =>
+  console.log("Server running on port 5000")
+);
