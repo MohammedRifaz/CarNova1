@@ -1,5 +1,6 @@
 // src/api.js
-export const API_URL = "https://carnova1.onrender.com";
+export const API_URL = "https://carnova1.onrender.com/api";
+
 
 export const fetchCars = async () => {
   const res = await fetch(`${API_URL}/cars`);
