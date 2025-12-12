@@ -6,15 +6,16 @@ import authRoutes from "./routes/authRoutes.js";
 const app = express();
 
 // CORS configuration for local + production frontend
+
 const allowedOrigins = [
-  "http://localhost:5173", // Vite dev server
-  "https://your-netlify-site.netlify.app" // replace with your Netlify URL
+  "http://localhost:5173", // local Vite dev
+  "https://carnova1.netlify.app/" // your Netlify URL
 ];
 
 app.use(cors({
   origin: allowedOrigins,
   methods: "GET,POST,PUT,DELETE",
-  allowedHeaders: "Content-Type,Authorization"
+  allowedHeaders: "Content-Type,Authorization",
 }));
 
 app.use(express.json());
