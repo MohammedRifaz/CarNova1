@@ -1,5 +1,5 @@
 // src/api.js
-const API_URL = "http://localhost:5000/api";
+export const API_URL = "https://carnova1.onrender.com";
 
 export const fetchCars = async () => {
   const res = await fetch(`${API_URL}/cars`);
